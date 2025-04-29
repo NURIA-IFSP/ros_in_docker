@@ -20,13 +20,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 FROM ignaciovizzo/ros_in_docker:noetic
-LABEL maintainer="Ignacio Vizzo <ignaciovizzo@gmail.com>"
 
-# Add any additional dependencies here:
+LABEL maintainer="NURIA <nuria@ifsp.edu.br>"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instala XFCE + noVNC + dependências gráficas
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    rsync \
-    && rm -rf /var/lib/apt/lists/*
+    xfce4 xfce4-goodies tightvncserver novnc websockify \
+    xterm dbus-x11 x11-xserver-utils \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# $USER_NAME Inherited from .base/Dockerfile
-WORKDIR /home/$USER_NAME/ros_ws
-CMD ["zsh"]
+# Copia script de inicialização gráfica
+COPY startup.sh /usr/local/bin/startup.sh
+RUN chmod +x /usr/local/bin/startup.sh
+
+# Expõe a porta noVNC
+EXPOSE 6080
+
+# Inicia o XFCE + noVNC
+CMD ["/usr/local/bin/startup.sh"]

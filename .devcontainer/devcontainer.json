@@ -20,23 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 {
-	"name": "ROS in Docker (Noetic)",
-	"dockerComposeFile": [
-		"../docker-compose.yaml",
-		"docker-compose.yml"
-	],
-	"service": "ros",
-	"workspaceFolder": "/home/user/ros_ws",
-	"remoteUser": "user",
+	"name": "ROS Noetic + GUI",
+	"build": {
+	  "dockerfile": "Dockerfile"
+	},
+	"forwardPorts": [6080],
 	"customizations": {
-		"vscode": {
-			"extensions": [
-				"llvm-vs-code-extensions.vscode-clangd",
-				"ms-python.python",
-				"ms-vscode.cpptools",
-				"redhat.vscode-xml",
-				"twxs.cmake"
-			]
-		}
-	}
-}
+	  "vscode": {
+		"extensions": [
+		  "ms-python.python",
+		  "ms-vscode.cpptools",
+		  "redhat.vscode-xml",
+		  "twxs.cmake"
+		]
+	  }
+	},
+	"remoteUser": "user"
+  }
+  

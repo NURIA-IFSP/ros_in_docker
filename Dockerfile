@@ -41,7 +41,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     xfonts-base \
     xfonts-100dpi \
     xfonts-75dpi \
-    xserver-xorg-input-all \   # Pacote para os drivers de entrada
+    xserver-xorg-input-all \  
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copia o script de inicialização gráfica

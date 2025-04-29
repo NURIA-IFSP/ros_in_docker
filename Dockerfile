@@ -25,13 +25,26 @@ LABEL maintainer="NURIA <nuria@ifsp.edu.br>"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instala XFCE + noVNC + dependências gráficas
+# Instala apenas os pacotes essenciais do XFCE e dependências necessárias para o VNC e X11
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    xfce4 xfce4-goodies tightvncserver novnc websockify \
-    xterm dbus-x11 x11-xserver-utils \
+    xfce4-session \
+    xfce4-panel \
+    xfce4-terminal \
+    xfce4-settings \
+    tightvncserver \
+    novnc \
+    websockify \
+    xterm \
+    xkb-data \
+    dbus-x11 \
+    x11-xserver-utils \
+    xfonts-base \
+    xfonts-100dpi \
+    xfonts-75dpi \
+    xserver-xorg-input-all \   # Pacote para os drivers de entrada
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copia script de inicialização gráfica
+# Copia o script de inicialização gráfica
 COPY startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
 

@@ -22,7 +22,8 @@
 {
   "name": "ROS Noetic + GUI",
   "build": {
-    "dockerfile": "../Dockerfile"
+    "dockerfile": "../Dockerfile",
+    "context": ".."
   },
   "forwardPorts": [6080],
   "customizations": {

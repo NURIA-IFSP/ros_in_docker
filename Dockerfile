@@ -25,23 +25,33 @@ LABEL maintainer="NURIA <nuria@ifsp.edu.br>"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instala apenas os pacotes essenciais do XFCE e dependências necessárias para o VNC e X11
+# Adiciona o repositório oficial do TurboVNC
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    ca-certificates && \
+    wget -qO - https://packagecloud.io/dcommander/turbovnc/gpgkey | gpg --dearmor -o /usr/share/keyrings/turbovnc-archive-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/turbovnc-archive-keyring.gpg] https://packagecloud.io/dcommander/turbovnc/ubuntu/ focal main" \
+    > /etc/apt/sources.list.d/turbovnc.list
+
+# Instala XFCE + TurboVNC + noVNC + dependências
 RUN apt-get update && apt-get install --no-install-recommends -y \
     xfce4-session \
     xfce4-panel \
     xfce4-terminal \
     xfce4-settings \
-    tightvncserver \
+    turbovnc \
     novnc \
     websockify \
     xterm \
     xkb-data \
     dbus-x11 \
     x11-xserver-utils \
+    x11-xkb-utils \
     xfonts-base \
     xfonts-100dpi \
     xfonts-75dpi \
-    xserver-xorg-input-all \  
+    xserver-xorg-input-all \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copia o script de inicialização gráfica
@@ -51,5 +61,5 @@ RUN chmod +x /usr/local/bin/startup.sh
 # Expõe a porta noVNC
 EXPOSE 6080
 
-# Inicia o XFCE + noVNC
+# Inicia XFCE + noVNC
 CMD ["/usr/local/bin/startup.sh"]

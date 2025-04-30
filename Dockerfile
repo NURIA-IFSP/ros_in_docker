@@ -52,4 +52,4 @@ RUN chmod +x /usr/local/bin/startup.sh
 EXPOSE 6080
 
 # Inicia o XFCE + noVNC
-CMD ["/usr/local/bin/startup.sh"]
+ENTRYPOINT ["/usr/local/bin/startup.sh"]

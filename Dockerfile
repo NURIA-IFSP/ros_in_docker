@@ -25,30 +25,47 @@ LABEL maintainer="NURIA <nuria@ifsp.edu.br>"
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instala apenas os pacotes essenciais do XFCE e dependências necessárias para o VNC e X11
-RUN apt-get update && apt-get install --no-install-recommends -y \
+# Instala dependências básicas do ambiente gráfico e ferramentas
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    gnupg \
+    ca-certificates \
+    git \
+    python3 \
+    python3-pip \
+    dbus-x11 \
     xfce4-session \
     xfce4-panel \
     xfce4-terminal \
     xfce4-settings \
-    tightvncserver \
-    novnc \
-    websockify \
     xterm \
     xkb-data \
-    dbus-x11 \
     x11-xserver-utils \
+    x11-xkb-utils \
     xfonts-base \
     xfonts-100dpi \
     xfonts-75dpi \
-    xserver-xorg-input-all \  
+    xserver-xorg-input-all \
+    libjpeg-turbo8 \
+    libxtst6 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copia o script de inicialização gráfica
+# Instala TurboVNC via .deb diretamente
+RUN wget https://sourceforge.net/projects/turbovnc/files/3.1.1/turbovnc_3.1.1_amd64.deb && \
+    dpkg -i turbovnc_3.1.1_amd64.deb && \
+    rm turbovnc_3.1.1_amd64.deb
+
+# Instala o noVNC manualmente
+RUN mkdir -p /opt/novnc && \
+    git clone https://github.com/novnc/noVNC.git /opt/novnc && \
+    git clone https://github.com/novnc/websockify /opt/novnc/utils/websockify && \
+    ln -s /opt/novnc/vnc.html /opt/novnc/index.html
+
+# Copia o script de inicialização
 COPY startup.sh /usr/local/bin/startup.sh
 RUN chmod +x /usr/local/bin/startup.sh
 
-# Expõe a porta noVNC
 EXPOSE 6080
 
 # Inicia o XFCE + noVNC

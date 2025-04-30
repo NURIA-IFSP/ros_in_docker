@@ -1,33 +1,27 @@
 #!/bin/bash
-
 export DISPLAY=:1
 
-# Define usuário padrão se não estiver definido
-if [ -z "$USER" ]; then
-  export USER=$(whoami)
+# Cria diretório e senha do VNC se necessário
+mkdir -p ~/.vnc
+if [ ! -f ~/.vnc/passwd ]; then
+    echo "rosvnc" | /opt/TurboVNC/bin/vncpasswd -f > ~/.vnc/passwd
+    chmod 600 ~/.vnc/passwd
 fi
 
-# Cria senha VNC padrão (caso não exista)
-if [ ! -f "/home/$USER/.vnc/passwd" ]; then
-  mkdir -p /home/$USER/.vnc
-  echo "rosvnc" | vncpasswd -f > /home/$USER/.vnc/passwd
-  chmod 600 /home/$USER/.vnc/passwd
-fi
-
-# Mata sessão anterior (caso exista)
-vncserver -kill :1 > /dev/null 2>&1
+# Finaliza VNC anterior
+/opt/TurboVNC/bin/vncserver -kill :1 > /dev/null 2>&1 || true
 rm -rf /tmp/.X1-lock /tmp/.X11-unix/X1
 
-# Inicia VNC com XFCE e caminho de fontes explícito
-echo "Iniciando VNC..."
-vncserver :1 -geometry 1900x900 -depth 24 -fp /usr/share/fonts/X11/misc
+# Inicia servidor VNC com XFCE
+/opt/TurboVNC/bin/vncserver :1 -geometry 1920x1080 -depth 24 -fg &
 
-echo "VNC server started on DISPLAY=:1"
+# Espera o servidor VNC subir
+sleep 3
 
-# Inicia noVNC no navegador
-websockify --web=/usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5901 &
+# Inicia noVNC apontando para o VNC
+/opt/novnc/utils/launch.sh --vnc localhost:5901 --listen 6080 &
 
-echo "noVNC running at http://localhost:6080 (senha: rosvnc)"
+echo "✅ Acesse no navegador: http://localhost:6080 (senha: rosvnc)"
 
-# Mantém o container ativo
+# Mantém o container rodando
 tail -f /dev/null

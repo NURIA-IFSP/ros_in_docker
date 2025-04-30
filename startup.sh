@@ -1,24 +1,27 @@
 #!/bin/bash
 export DISPLAY=:1
 
-# Usa TurboVNC
-VNC_CMD="/opt/TurboVNC/bin/vncserver"
-
-# Cria senha se não existir
+# Cria diretório e senha do VNC se necessário
 mkdir -p ~/.vnc
-[ ! -f ~/.vnc/passwd ] && echo "rosvnc" | $VNC_CMD -passwd ~/.vnc/passwd
+if [ ! -f ~/.vnc/passwd ]; then
+    echo "rosvnc" | /opt/TurboVNC/bin/vncpasswd -f > ~/.vnc/passwd
+    chmod 600 ~/.vnc/passwd
+fi
 
-# Mata sessões antigas
-$VNC_CMD -kill :1 > /dev/null 2>&1
+# Finaliza VNC anterior
+/opt/TurboVNC/bin/vncserver -kill :1 > /dev/null 2>&1 || true
 rm -rf /tmp/.X1-lock /tmp/.X11-unix/X1
 
-# Inicia VNC
-$vncserver :1 -geometry 1900x900 -depth 24
+# Inicia servidor VNC com XFCE
+/opt/TurboVNC/bin/vncserver :1 -geometry 1920x1080 -depth 24 -fg &
 
-# Inicia noVNC
-websockify --web=/usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5901 &
+# Espera o servidor VNC subir
+sleep 3
 
-echo "noVNC running at http://localhost:6080 (senha: rosvnc)"
+# Inicia noVNC apontando para o VNC
+/opt/novnc/utils/launch.sh --vnc localhost:5901 --listen 6080 &
 
-# Mantém o container ativo
+echo "✅ Acesse no navegador: http://localhost:6080 (senha: rosvnc)"
+
+# Mantém o container rodando
 tail -f /dev/null
